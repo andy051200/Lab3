@@ -10,6 +10,7 @@
 ;---------libreras a emplementar-----------------------------------------------
 PROCESSOR 16F887
 #include <xc.inc>
+    
 
 ;----------------------bits de configuraci贸n-----------------------------------
 ;------configuration word 1----------------------------------------------------
@@ -39,10 +40,8 @@ ORG 0x000		    ; ubicaci贸n inicial de resetVector
 resetVec:		    ; se declara el vector
 PAGESEL main	    
 goto main
-    
-;colocar tabla ac谩
 
-;---------------------- configuraci贸n de programa -----------------------------
+;---------------------- configuraci髇 de programa -----------------------------
 PSECT code, delta=2, abs    ; se ubica el c贸digo de 2 bytes
 ORG 0x100
 tabla:
@@ -68,15 +67,15 @@ tabla:
     retlw   01110001B	    ; F
     
 main:
-    call	io_config
-    call	reloj_config
-    call	config_timer
+    call	io_config	; rutina de configuraci髇 in/out
+    call	reloj_config	; rutina de configuraci髇 de reloj
+    call	config_timer	; rutina de configuraci髇 de relok
     banksel	PORTA
     
     clrf	PORTA		; entradas pushbottons
     clrf	PORTB		; salida contador 1
     movlw	00111111B	; valor inicial del 7 segmentos
-    movwf	PORTC
+    movwf	PORTC		; valor inicial se mueve al PortC
     movlw	0x0
     movwf	cont
        
@@ -153,10 +152,10 @@ contador:
     return
 
 comparador:
-    movwf	cont,W ; mover contador de bits a reg W
-    subwf	TRISB, W ; restar variable contadora del PortB (auto leds)
-    btfsc	STATUS, 2 ; evaluar si bit zero = 0 para confirmar
-    movwf	PORTD,0; mover resultado a PortD para prender led
+    movwf	cont,W	    ; mover contador de bits a reg W
+    subwf	TRISB, W    ; restar variable contadora del PortB (auto leds)
+    btfsc	STATUS, 2    ; evaluar si bit zero = 0 para confirmar
+    movwf	PORTD,0	    ; mover resultado a PortD para prender led
     call	reset_timer ; se reinicia el timer
     return
     
