@@ -87,7 +87,7 @@ loop:
     btfsc	PORTA, 1	;
     call	resta		;
     call	contador	;
-    ;call	comparador	;
+    call	comparador	;
     goto	loop		;
     
 ;-------------------- subrutinas de programa ----------------------------------
