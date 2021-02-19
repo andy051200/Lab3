@@ -40,6 +40,8 @@ resetVec:		    ; se declara el vector
 PAGESEL main	    
 goto main
     
+;colocar tabla acá
+
 ;---------------------- configuración de programa -----------------------------
 PSECT code, delta=2, abs    ; se ubica el código de 2 bytes
 ORG 0x100
@@ -74,7 +76,7 @@ main:
     clrf	PORTA		; entradas pushbottons
     clrf	PORTB		; salida contador 1
     movlw	00111111B	; valor inicial del 7 segmentos
-    movwf	PORTC		;
+    movwf	PORTC
     movlw	0x0
     movwf	cont
        
@@ -108,7 +110,7 @@ reloj_config:
     return
 
 config_timer:
-    banksel	TRISA	    ; 
+    banksel	TRISA
     bcf		T0CS	    ; Internal instruction cycle clock = 0
     bcf		PSA	    ; estos PS son el preescaler
     bsf		PS2	    ; prescaler 111
@@ -127,7 +129,7 @@ reset_timer:
 suma:
     btfsc	PORTA, 0
     goto	$-1	    ; regresar una linea en código
-    incf	cont  
+    incf	cont
     movf	cont, W	    ; se almacena en W
     call	tabla	    ; se toma el valor dentro de tabla
     movwf	PORTC	    ; valor que tenga tabla se manda a PortC
@@ -137,7 +139,7 @@ resta:
     btfsc	PORTA, 1
     goto	$-1	    ; regresar una linea en código
     decf	cont
-    movf	cont, W  
+    movf	cont, W
     call	tabla
     movwf	PORTC
     return
@@ -146,7 +148,7 @@ contador:
     btfss   T0IF	    ; skip if set cuando termine de contar a 256
     goto    $-1		    ; loop si pasa o no
     call    reset_timer	    ; amonos reiniciando timer
-    incf    PORTB	    ; se incrementan leds de PortB
+    incf    PORTB
     return
 /*
 comparador:
@@ -154,26 +156,5 @@ comparador:
     return
     */
     
-    ;COMPARAR f CON T0IF
-END   
-    
-    
-    banksel	STATUS
-    clrf	STATUS	    ; deja configurado el bit Z
-    ;usar movwf o bcf o    bsf
-    bsf		STATUS, RP0
-    clrf	TRISB ^ 80
-    bcf		STATUS, RP0
-    goto 4
-    
-    bsf		STATUS, RP0
-    ;clrf	TRISB ya lo hice allá arriba
-    movlw	;numero a evaluar
-    movwf	TRISA
-    bcf		STATUS, RP0
-
-	
-	
-    
-       
-    
+    ;COMPARAR PUERTO B CON CONT
+END      
