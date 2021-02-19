@@ -87,6 +87,7 @@ loop:
     btfsc	PORTA, 1	;
     call	resta		;
     call	contador	;
+    ;call	comparador	;
     goto	loop		;
     
 ;-------------------- subrutinas de programa ----------------------------------
@@ -150,11 +151,13 @@ contador:
     call    reset_timer	    ; amonos reiniciando timer
     incf    PORTB
     return
-/*
+
 comparador:
-    
+    movwf	cont,W ; mover contador de bits a reg W
+    subwf	TRISB, W ; restar variable contadora del PortB (auto leds)
+    btfsc	STATUS, 2 ; evaluar si bit zero = 0 para confirmar
+    movwf	PORTD,0; mover resultado a PortD para prender led
+    call	reset_timer ; se reinicia el timer
     return
-    */
     
-    ;COMPARAR PUERTO B CON CONT
 END      
