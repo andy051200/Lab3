@@ -10,7 +10,6 @@
 ;---------libreras a emplementar-----------------------------------------------
 PROCESSOR 16F887
 #include <xc.inc>
-    
 
 ;----------------------bits de configuraci贸n-----------------------------------
 ;------configuration word 1----------------------------------------------------
@@ -40,8 +39,10 @@ ORG 0x000		    ; ubicaci贸n inicial de resetVector
 resetVec:		    ; se declara el vector
 PAGESEL main	    
 goto main
+    
+;colocar tabla ac谩
 
-;---------------------- configuraci髇 de programa -----------------------------
+;---------------------- configuraci贸n de programa -----------------------------
 PSECT code, delta=2, abs    ; se ubica el c贸digo de 2 bytes
 ORG 0x100
 tabla:
@@ -67,15 +68,15 @@ tabla:
     retlw   01110001B	    ; F
     
 main:
-    call	io_config	; rutina de configuraci髇 in/out
-    call	reloj_config	; rutina de configuraci髇 de reloj
-    call	config_timer	; rutina de configuraci髇 de relok
+    call	io_config
+    call	reloj_config
+    call	config_timer
     banksel	PORTA
     
     clrf	PORTA		; entradas pushbottons
     clrf	PORTB		; salida contador 1
     movlw	00111111B	; valor inicial del 7 segmentos
-    movwf	PORTC		; valor inicial se mueve al PortC
+    movwf	PORTC
     movlw	0x0
     movwf	cont
        
@@ -86,7 +87,7 @@ loop:
     btfsc	PORTA, 1	;
     call	resta		;
     call	contador	;
-    call	comparador	;
+    ;call	comparador	;
     goto	loop		;
     
 ;-------------------- subrutinas de programa ----------------------------------
@@ -152,11 +153,21 @@ contador:
     return
 
 comparador:
-    movwf	cont,W	    ; mover contador de bits a reg W
-    subwf	TRISB, W    ; restar variable contadora del PortB (auto leds)
-    btfsc	STATUS, 2    ; evaluar si bit zero = 0 para confirmar
-    movwf	PORTD,0	    ; mover resultado a PortD para prender led
-    call	reset_timer ; se reinicia el timer
+    movf	cont,W 		; mover contador de bits a reg W
+    subwf	PORTB,W		; restar variable contadora del PortB (auto leds)
+    btfsc	STATUS, 2	; evaluar si bit zero = 0 para confirmar
+    bsf		PORTD, 0	; mover resultado a PortD para prender led
+    call	reset_timer	; se reinicia el timer
+    ;call	delay_small
+    bcf		PORTD, 0
     return
+
+/*delay_small:
+    movlw	150	    ; se toma tiempo de 
+    movwf	cont	    ;
+    decfsz	cont, 1	    ; se resta 1 a variable contadora
+    goto	$-1
+    return篓*/
+    ; apagar led, y reiniciar en portb
     
 END      
