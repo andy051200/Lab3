@@ -3,7 +3,7 @@
 ;Microcontrolador: PIC16F887
 ;Autor: Andy Bonilla
 ;Programa: timer0
-;Descripción:  contador hexadecimal con display 7seg y luz de alarma
+;DescripciÃ³n:  contador hexadecimal con display 7seg y luz de alarma
 ;Hardware: 
 ;------------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ PROCESSOR 16F887
 #include <xc.inc>
     
 
-;----------------------bits de configuración-----------------------------------
+;----------------------bits de configuraciÃ³n-----------------------------------
 ;------configuration word 1----------------------------------------------------
 CONFIG  FOSC=INTRC_NOCLKOUT ;se declara osc interno
 CONFIG  WDTE=OFF            ; Watchdog Timer apagado
@@ -27,25 +27,25 @@ CONFIG  FCMEN=OFF           ; Fail-Safe Clock Monitor Enabled bit apagado
 CONFIG  LVP=ON		    ; low voltaje programming prendido
 
 ;------configuration word 2-------------------------------------------------
-CONFIG BOR4V=BOR40V	    ;configuración de brown out reset
-CONFIG WRT = OFF	    ;apagado de auto escritura de cÃ³digo
+CONFIG BOR4V=BOR40V	    ;configuraciÃ³n de brown out reset
+CONFIG WRT = OFF	    ;apagado de auto escritura de cÃƒÂ³digo
 
 PSECT udata_bank0	    ; 
     cont: DS 1 ; variable de contador 1 byte
 
-PSECT resVect, class=CODE, abs, delta=2 ; ubicaciÃ³n de resetVector 2bytes
+PSECT resVect, class=CODE, abs, delta=2 ; ubicaciÃƒÂ³n de resetVector 2bytes
 
 ;---------------reset vector----------------------------------------------------
-ORG 0x000		    ; ubicación inicial de resetVector
+ORG 0x000		    ; ubicaciÃ³n inicial de resetVector
 resetVec:		    ; se declara el vector
 PAGESEL main	    
 goto main
 
-;---------------------- configuraci�n de programa -----------------------------
-PSECT code, delta=2, abs    ; se ubica el código de 2 bytes
+;---------------------- configuración de programa -----------------------------
+PSECT code, delta=2, abs    ; se ubica el cÃ³digo de 2 bytes
 ORG 0x100
 tabla:
-    clrf    PCLATH	    ; asegurarase de estar en sección
+    clrf    PCLATH	    ; asegurarase de estar en secciÃ³n
     bsf	    PCLATH, 0 	    ; 
     andlw   0x0f	    ; se eliminan los 4 MSB y se dejan los 4 LSB
     addwf   PCL, F	    ; se guarda en F
@@ -67,9 +67,9 @@ tabla:
     retlw   01110001B	    ; F
     
 main:
-    call	io_config	; rutina de configuraci�n in/out
-    call	reloj_config	; rutina de configuraci�n de reloj
-    call	config_timer	; rutina de configuraci�n de relok
+    call	io_config	; rutina de configuración in/out
+    call	reloj_config	; rutina de configuración de reloj
+    call	config_timer	; rutina de configuración de relok
     banksel	PORTA
     
     clrf	PORTA		; entradas pushbottons
@@ -93,21 +93,21 @@ loop:
 io_config:
     banksel	ANSEL	    ; entrada digital
     clrf	ANSEL	    ; aseguramos que sea digital
-    clrf        ANSELH	    ; configuración de pin analógico
+    clrf        ANSELH	    ; configuraciÃ³n de pin analÃ³gico
     
-    banksel	TRISA	    ; selección de entrada o salida 
-    bsf	        TRISA, 0    ; RA0 -> entrada analógica
-    bsf	        TRISA, 1    ; RA1 -> entrada analógica
+    banksel	TRISA	    ; selecciÃ³n de entrada o salida 
+    bsf	        TRISA, 0    ; RA0 -> entrada analÃ³gica
+    bsf	        TRISA, 1    ; RA1 -> entrada analÃ³gica
     clrf	TRISB	    ; PortB se configura como salida
     clrf	TRISC	    ; PortC se configura como salida
-    bcf		TRISD,0
+    bcf		TRISD,0	    ; PortD se configura como salida
     return
     
 reloj_config:
     banksel	OSCCON
-    bcf		IRCF2	    ; clear, configuración de frecuencia a 250kHz (010)
-    bsf		IRCF1	    ; set, configuración de frecuencia a 250kHz (010)
-    bcf		IRCF0	    ; clear, configuración de frecuencia a 250kHz (010)
+    bcf		IRCF2	    ; clear, configuraciÃ³n de frecuencia a 250kHz (010)
+    bsf		IRCF1	    ; set, configuraciÃ³n de frecuencia a 250kHz (010)
+    bcf		IRCF0	    ; clear, configuraciÃ³n de frecuencia a 250kHz (010)
     return
 
 config_timer:
@@ -116,7 +116,7 @@ config_timer:
     bcf		PSA	    ; estos PS son el preescaler
     bsf		PS2	    ; prescaler 111
     bsf		PS1	    ; prescaler 111
-    bsf		PS0	    ; prescaler 111
+    bsf		PS0	    ; prescaler 111 jsjs
     banksel	PORTA
     call	reset_timer
     return
@@ -124,12 +124,12 @@ config_timer:
 reset_timer:
     movlw	134	    ; 
     movwf	TMR0	    ; se guarda en timer0
-    bcf		T0IF	    ; bandera cuando no hay overflow
+    bsf		T0IF	    ; bandera cuando no hay overflow
     return
    
 suma:
     btfsc	PORTA, 0
-    goto	$-1	    ; regresar una linea en código
+    goto	$-1	    ; regresar una linea en cÃ³digo
     incf	cont
     movlw	00001111B	    ; se pone limite
     andwf	cont, F	    ; pone limite de los bits y almacena en F
@@ -140,7 +140,7 @@ suma:
 
 resta:
     btfsc	PORTA, 1
-    goto	$-1	    ; regresar una linea en código
+    goto	$-1	    ; regresar una linea en cÃ³digo
     decf	cont	    ; 
     movlw	00001111B   ; se pone limite
     andwf	cont, F	    ; pone limite de los bits
@@ -150,7 +150,7 @@ resta:
     return
     
 contador:
-    btfss	T0IF		; skip if set cuando termine de contar a 256
+    btfss	T0IF		; skip if set cuando se prenda T0IF
     goto	$-1		; loop si pasa o no
     call	reset_timer	; amonos reiniciando timer
     incf	PORTB
@@ -159,22 +159,14 @@ contador:
     
     return
 
+    
 comparador:
     movf	cont,W 		; mover contador de bits a reg W
     subwf	PORTB,W		; restar variable contadora del PortB (auto leds)
     btfsc	STATUS, 2	; evaluar si bit zero = 0 para confirmar
     bsf		PORTD, 0	; mover resultado a PortD para prender led
-    call	reset_timer	; se reinicia el timer
-    ;call	delay_small
+    call	reset_timer
     bcf		PORTD, 0
     return
 
-/*delay_small:
-    movlw	150	    ; se toma tiempo de 
-    movwf	cont	    ;
-    decfsz	cont, 1	    ; se resta 1 a variable contadora
-    goto	$-1
-    return*/
-    ; apagar led, y reiniciar en portb
-    
 END      
