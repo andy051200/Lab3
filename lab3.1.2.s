@@ -10,6 +10,7 @@
 ;---------libreras a emplementar-----------------------------------------------
 PROCESSOR 16F887
 #include <xc.inc>
+    
 
 ;----------------------bits de configuraci贸n-----------------------------------
 ;------configuration word 1----------------------------------------------------
@@ -39,10 +40,8 @@ ORG 0x000		    ; ubicaci贸n inicial de resetVector
 resetVec:		    ; se declara el vector
 PAGESEL main	    
 goto main
-    
-;colocar tabla ac谩
 
-;---------------------- configuraci贸n de programa -----------------------------
+;---------------------- configuraci髇 de programa -----------------------------
 PSECT code, delta=2, abs    ; se ubica el c贸digo de 2 bytes
 ORG 0x100
 tabla:
@@ -68,15 +67,15 @@ tabla:
     retlw   01110001B	    ; F
     
 main:
-    call	io_config
-    call	reloj_config
-    call	config_timer
+    call	io_config	; rutina de configuraci髇 in/out
+    call	reloj_config	; rutina de configuraci髇 de reloj
+    call	config_timer	; rutina de configuraci髇 de relok
     banksel	PORTA
     
     clrf	PORTA		; entradas pushbottons
     clrf	PORTB		; salida contador 1
     movlw	00111111B	; valor inicial del 7 segmentos
-    movwf	PORTC
+    movwf	PORTC		; valor inicial se mueve al PortC
     movlw	0x0
     movwf	cont
        
@@ -87,7 +86,7 @@ loop:
     btfsc	PORTA, 1	;
     call	resta		;
     call	contador	;
-    ;call	comparador	;
+    call	comparador	;
     goto	loop		;
     
 ;-------------------- subrutinas de programa ----------------------------------
@@ -101,6 +100,7 @@ io_config:
     bsf	        TRISA, 1    ; RA1 -> entrada anal贸gica
     clrf	TRISB	    ; PortB se configura como salida
     clrf	TRISC	    ; PortC se configura como salida
+    bcf		TRISD,0
     return
     
 reloj_config:
@@ -131,6 +131,8 @@ suma:
     btfsc	PORTA, 0
     goto	$-1	    ; regresar una linea en c贸digo
     incf	cont
+    movlw	00001111B	    ; se pone limite
+    andwf	cont, F	    ; pone limite de los bits y almacena en F
     movf	cont, W	    ; se almacena en W
     call	tabla	    ; se toma el valor dentro de tabla
     movwf	PORTC	    ; valor que tenga tabla se manda a PortC
@@ -139,17 +141,22 @@ suma:
 resta:
     btfsc	PORTA, 1
     goto	$-1	    ; regresar una linea en c贸digo
-    decf	cont
+    decf	cont	    ; 
+    movlw	00001111B   ; se pone limite
+    andwf	cont, F	    ; pone limite de los bits
     movf	cont, W
     call	tabla
     movwf	PORTC
     return
     
 contador:
-    btfss   T0IF	    ; skip if set cuando termine de contar a 256
-    goto    $-1		    ; loop si pasa o no
-    call    reset_timer	    ; amonos reiniciando timer
-    incf    PORTB
+    btfss	T0IF		; skip if set cuando termine de contar a 256
+    goto	$-1		; loop si pasa o no
+    call	reset_timer	; amonos reiniciando timer
+    incf	PORTB
+    movlw	00001111B	; se pone limite a contador
+    andwf	PORTB, F	; pone limite de los bits 
+    
     return
 
 comparador:
@@ -167,7 +174,7 @@ comparador:
     movwf	cont	    ;
     decfsz	cont, 1	    ; se resta 1 a variable contadora
     goto	$-1
-    return篓*/
+    return*/
     ; apagar led, y reiniciar en portb
     
 END      
